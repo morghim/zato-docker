@@ -1,0 +1,5 @@
+# to run docker compose first build image 
+
+docker build . -t zato:latest
+
+docker-compose up -d

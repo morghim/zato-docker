@@ -10,7 +10,7 @@ services:
     restart: always
     command:
       - --shared_buffers=512MB
-      - --max_connections=1000
+      - --max_connections=10000
   kvdb:
     image: redis
     # command: redis-server --requirepass mfH83RoLRxzm6AVysL7RxGLVbgbFwzHdFTs
@@ -34,7 +34,7 @@ services:
   zato:
     image: zato:latest
     volumes:
-      - qs-data:/env/
+      - qs-data:/env:rw
       - ./entrypoint.sh:/entrypoint.sh
     environment:
       - POSTGRES_PASSWORD=postgres
@@ -46,6 +46,11 @@ services:
       - 17010:17010
     depends_on:
       - db
+    restart: always
+      
+      
+
+
 
 volumes:
   db-data:
