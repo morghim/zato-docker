@@ -1,0 +1,58 @@
+version: '3'
+services:
+  db:
+    image: postgres:14
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: zato
+    restart: always
+    command:
+      - --shared_buffers=512MB
+      - --max_connections=1000
+  kvdb:
+    image: redis
+    # command: redis-server --requirepass mfH83RoLRxzm6AVysL7RxGLVbgbFwzHdFTs
+    # options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+    restart: always
+    volumes:
+      - redis-data:/data
+  # vault:
+  #   image: vault
+  #   environment:
+  #       VAULT_ADDR: http://0.0.0.0:8200
+  #   ports:
+  #       - "8200:8200"
+  #   volumes:
+  #       - vault-data:/vault/file:rw
+  #       - ./vault:/vault/config:rw
+  #   cap_add:
+  #       - IPC_LOCK
+  #   entrypoint: vault server -config=/vault/config/vault.json
+  
+  zato:
+    image: zato:latest
+    volumes:
+      - qs-data:/env/
+      - ./entrypoint.sh:/entrypoint.sh
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - ADMIN_PASSWORD=admin
+    entrypoint: sh /entrypoint.sh
+    ports:
+      - 8183:8183
+      - 11223:11223
+      - 17010:17010
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+  redis-data:
+  vault-data:
+  qs-data:
+  
+
+
+  
