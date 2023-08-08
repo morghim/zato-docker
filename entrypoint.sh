@@ -5,15 +5,18 @@ DIR=/env/prod1
 if [ -d "$DIR" ]
 then
     echo "start another container"
+    python /startup.py
     ./env/prod1/zato-qs-start.sh
 else
     echo "initial zato first run"
-    zato quickstart create --odb-type postgresql --odb-host db --odb-port 5432 --odb-user postgres --odb-db-name zato --odb-password $POSTGRES_PASSWORD --verbose /env/prod1
+    zato quickstart create --odb-type postgresql --odb-host db --odb-port 5432 --odb-user postgres --odb-db-name zato --odb-password $POSTGRES_PASSWORD --verbose --servers 2 /env/prod1
     zato update password /env/prod1/web-admin/ admin --password $ADMIN_PASSWORD
+    python /startup.py
     ./env/prod1/zato-qs-start.sh
     sleep 5
 
 fi
+
 
 tail -f /dev/null
 

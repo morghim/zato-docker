@@ -11,6 +11,12 @@ RUN groupadd zato \
     && useradd --comment "Zato Enterprise Service Bus" --home-dir /opt/zato --create-home --shell /bin/bash --gid zato zato \
     && adduser zato sudo
 RUN echo "zato:zato" | chpasswd
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
+/etc/sudoers
 RUN git clone https://github.com/morghim/zato.git
-RUN ./zato/code/install.sh -p python3
-# CMD ["/bin/bash"]
+COPY startup.py zato/code/
+RUN mkdir /hot-deploy
+WORKDIR zato/code/
+RUN chown zato:zato . -R
+USER zato
+RUN ./install.sh -p python3
